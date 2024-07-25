@@ -750,7 +750,9 @@ def Negotiation2():
 
     if st.button("Submit your negotiations", key="submit_neg"):
         # print("Submitting the following data:", transformed)
-        save_data_to_excel(st.session_state.transformed, "survey_responses2.xlsx")
+        file_path = save_data_to_excel(
+            st.session_state.transformed, "survey_responses2.xlsx"
+        )
         st.success(f"Thank you for your participation!")
 
 
