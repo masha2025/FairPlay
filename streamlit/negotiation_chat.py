@@ -52,10 +52,10 @@ def save_data_to_excel(data, filename="data.xlsx"):
 
     try:
         # Open the specific worksheet by title
-        sheet = client.open("survey_responses").sheet1
+        sheet = client.open("survey_responses2").sheet1
     except gspread.SpreadsheetNotFound:
         # If the spreadsheet does not exist, create a new one and get the first sheet
-        sheet = client.create("survey_responses").sheet1
+        sheet = client.create("survey_responses2").sheet1
         # Set up the header row if creating new
         sheet.append_row(data.columns.tolist())
 
