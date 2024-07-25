@@ -562,6 +562,10 @@ def Questionnaire():
         key="stat12",
     )
 
+    equality = st.text_area("What is your understanding of equality?", height=150)
+    proportionality = st.text_area(
+        "What is your understanding of proportionality?", height=150
+    )
     # DataFrame creation with validation
     data = {
         "ParticipantID": [str(uuid.uuid4())],
@@ -573,12 +577,8 @@ def Questionnaire():
         "mother_tongue": [
             mother_tongue if mother_tongue != "Select an option" else None
         ],
-        "equality": [
-            st.text_area("What is your understanding of equality?", height=150)
-        ],
-        "proportionality": [
-            st.text_area("What is your understanding of proportionality?", height=150)
-        ],
+        "equality": [equality] if equality else [""],
+        "proportionality": [proportionality] if proportionality else [""],
         "Statement1": [stat1 if stat1 != "Select an option" else None],
         "Statement2": [stat2 if stat2 != "Select an option" else None],
         "Statement3": [stat3 if stat3 != "Select an option" else None],
