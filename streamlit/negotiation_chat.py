@@ -1,10 +1,9 @@
 import streamlit as st
 from openai import OpenAI
 from datetime import datetime
-import json
 import pandas as pd
 import os
-
+import json
 import gspread
 from streamlit_extras.switch_page_button import switch_page
 from oauth2client.service_account import ServiceAccountCredentials
@@ -52,11 +51,10 @@ def save_data_to_excel(data, filename="data.xlsx"):
 
     try:
         # Open the specific worksheet by title
-        sheet = client.open("survey_responses_continuation").sheet1
+        sheet = client.open("survey_responses2").sheet1
     except gspread.SpreadsheetNotFound:
-        # If the spreadsheet does not exist, create a new one and get the first
-        # sheet
-        sheet = client.create("survey_responses_continuation").sheet1
+        # If the spreadsheet does not exist, create a new one and get the first sheet
+        sheet = client.create("survey_responses2").sheet1
         # Set up the header row if creating new
         sheet.append_row(data.columns.tolist())
 
@@ -598,12 +596,12 @@ def main_page():
     if st.session_state.current_page > 0:
         if cols[0].button("Previous"):
             st.session_state.current_page -= 1
-            st.experimental_rerun()
+            st.rerun()
 
     if st.session_state.current_page < len(pages) - 1:
         if cols[3].button("Next"):
             st.session_state.current_page += 1
-            st.experimental_rerun()
+            st.rerun()
 
 
 if __name__ == "__main__":
