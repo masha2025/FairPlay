@@ -380,34 +380,226 @@ def Questionnaire():
         key="stat12",
     )
 
-    # DataFrame creation
+
+def Questionnaire():
+    st.header("Questionnaire")
+    st.write("Please fill out this brief survey to participate in the study.")
+
+    # Demographic Questions
+    age_options = [
+        "Select an option",
+        "18-20",
+        "21-25",
+        "26-30",
+        "31-39",
+        "40 and above",
+    ]
+    age = st.selectbox("What is your age range?", age_options, key="age_range")
+    gender = st.selectbox(
+        "What is your gender?",
+        ["Select an option", "Male", "Female", "Other"],
+        key="gender",
+    )
+    academic_degree = st.selectbox(
+        "What is your highest academic degree?",
+        ["Select an option", "Bachelor", "Master", "PhD", "Other"],
+        key="academic_degree",
+    )
+    is_english = st.selectbox(
+        "Is English your mother tongue?",
+        ["Select an option", "Yes", "No"],
+        key="is_english",
+    )
+    mother_tongue = (
+        st.text_input("What is your mother tongue?", key="mother_tongue")
+        if is_english == "No"
+        else "English"
+    )
+
+    # Statements
+    stat1 = st.selectbox(
+        "I think people who are more hard-working should end up with more money.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat1",
+    )
+    stat2 = st.selectbox(
+        "I think people should be rewarded in proportion to what they contribute.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat2",
+    )
+    stat3 = st.selectbox(
+        "The effort a worker puts into a job ought to be reflected in the size of a raise they receive.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat3",
+    )
+    stat4 = st.selectbox(
+        "It makes me happy when people are recognized on their merits.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat4",
+    )
+    stat5 = st.selectbox(
+        "In a fair society, those who work hard should live with higher standards of living.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat5",
+    )
+    stat6 = st.selectbox(
+        "I feel good when I see cheaters get caught and punished.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat6",
+    )
+    stat7 = st.selectbox(
+        "The world would be a better place if everyone made the same amount of money.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat7",
+    )
+    stat8 = st.selectbox(
+        "Our society would have fewer problems if people had the same income.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat8",
+    )
+    stat9 = st.selectbox(
+        "I believe that everyone should be given the same amount of resources in life.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat9",
+    )
+    stat10 = st.selectbox(
+        "I believe it would be ideal if everyone in society wound up with roughly the same amount of money.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat10",
+    )
+    stat11 = st.selectbox(
+        "When people work together toward a common goal, they should share the rewards equally, even if some worked harder on it.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat11",
+    )
+    stat12 = st.selectbox(
+        "I get upset when some people have a lot more money than others in my country.",
+        [
+            "Select an option",
+            "1 - Strongly Disagree",
+            "2 - Disagree",
+            "3 - Neutral",
+            "4 - Agree",
+            "5 - Strongly Agree",
+        ],
+        key="stat12",
+    )
+
+    # DataFrame creation with validation
     data = {
         "ParticipantID": [str(uuid.uuid4())],
-        "age": [age],
-        "gender": [gender],
-        "academic_degree": [academic_degree],
-        "mother_tongue": [mother_tongue],
+        "age": [age if age != "Select an option" else None],
+        "gender": [gender if gender != "Select an option" else None],
+        "academic_degree": [
+            academic_degree if academic_degree != "Select an option" else None
+        ],
+        "mother_tongue": [
+            mother_tongue if mother_tongue != "Select an option" else None
+        ],
         "equality": [
             st.text_area("What is your understanding of equality?", height=150)
         ],
         "proportionality": [
             st.text_area("What is your understanding of proportionality?", height=150)
         ],
-        "Statement1": [stat1],
-        "Statement2": [stat2],
-        "Statement3": [stat3],
-        "Statement4": [stat4],
-        "Statement5": [stat5],
-        "Statement6": [stat6],
-        "Statement7": [stat7],
-        "Statement8": [stat8],
-        "Statement9": [stat9],
-        "Statement10": [stat10],
-        "Statement11": [stat11],
-        "Statement12": [stat12],
+        "Statement1": [stat1 if stat1 != "Select an option" else None],
+        "Statement2": [stat2 if stat2 != "Select an option" else None],
+        "Statement3": [stat3 if stat3 != "Select an option" else None],
+        "Statement4": [stat4 if stat4 != "Select an option" else None],
+        "Statement5": [stat5 if stat5 != "Select an option" else None],
+        "Statement6": [stat6 if stat6 != "Select an option" else None],
+        "Statement7": [stat7 if stat7 != "Select an option" else None],
+        "Statement8": [stat8 if stat8 != "Select an option" else None],
+        "Statement9": [stat9 if stat9 != "Select an option" else None],
+        "Statement10": [stat10 if stat10 != "Select an option" else None],
+        "Statement11": [stat11 if stat11 != "Select an option" else None],
+        "Statement12": [stat12 if stat12 != "Select an option" else None],
     }
 
     st.session_state.transformed = pd.DataFrame(data)
+    print(st.session_state.transformed)
+
+    if "scenario" not in st.session_state:
+        st.session_state.scenario = "Work-Study Program"  # Default scenario
+    if "personality" not in st.session_state:
+        st.session_state.personality = "Default"  # Default personality
 
 
 def Negotiation1():
