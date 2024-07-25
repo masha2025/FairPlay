@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "interactionplatform"
+name = "fairplay"
 version = "0.1.0"
 description = "A Streamlit application for real-time interactions."
 authors = ["Veronika Tsishetska <veronikatsishetska@gmail.com>"]
