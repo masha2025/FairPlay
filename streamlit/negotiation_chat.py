@@ -4,52 +4,26 @@ from datetime import datetime
 import json
 import pandas as pd
 import os
+from st_aggrid import AgGrid, GridOptionsBuilder, JsCode
 import gspread
 from streamlit_extras.switch_page_button import switch_page
 from oauth2client.service_account import ServiceAccountCredentials
-import uuid
 
-# Initialize the OpenAI client (replace 'your-api-key' with your actual OpenAI API key)
+
+import uuid
+from uuid import UUID
+
 client = OpenAI(api_key=os.getenv("API_KEY"))
 
-scenarios_backgrounds = {
-    "Work-Study Program": "You play the role of an advisor in a work-study program negotiation. You are negotiating how to distribute funds among fictitious candidates for a work-study program. We have $30,000 to distribute among Alice, Bob, and Carol. Our goal is to allocate these funds in a way that supports their participation in the work-study program effectively. Background Information: Alice is a high academic achiever and has moderate financial need. Bob has average academic performance and high financial need. Carol has good academic performance and low financial need. Your goal is to convincingly **present your ideas and negotiate effectively** to persuade the chatbot. \n\n**Start with the predefined message by clicking on the 'Send' button.** Once the chatbot responds, **CONTINUE** to argue your points. **It is highly important to have MORE THAN ONE ROUND of negotiation. Please present your ideas, agreement or disagreement etc. and HAVE A DISCUSSION with the chatbot.** ",
-    "Selling a Company": "You play the role of a business partner in the process of selling a company. You and your partner end up getting an offer that pleases you both, namely $500,000, so now you face the enviable task of splitting up the money. You put twice as many hours into the firm’s start-up as your partner did, while he worked fulltime elsewhere to support his family. You, who are independently wealthy, were compensated nominally for your extra time. For you, the profit from the sale would be a nice bonus. For your partner, it would be a much-needed windfall. Your goal is to convincingly **present your ideas and negotiate effectively** to persuade the chatbot. \n\n**Start with the predefined message by clicking on the 'Send' button.** Once the chatbot responds, **CONTINUE** to argue your points. **It is highly important to have MORE THAN ONE ROUND of negotiation. Please present your ideas, agreement or disagreement etc. and HAVE A DISCUSSION with the chatbot.**",
-    "Bonus Allocation": "You play the role of an HR manager discussing bonus allocations. You and your negotiation partner have to allocate a bonus of $50,000 among three employees. The first employee exceeded the targets and took on additional responsibilities. The second employee showed great improvement and proactive behavior. The third employee performed solidly according to the role requirements. Your goal is to convincingly **present your ideas and negotiate effectively** to persuade the chatbot. \n\n**Start with the predefined message by clicking on the 'Send' button.** Once the chatbot responds, **CONTINUE** to argue your points. **It is highly important to have MORE THAN ONE ROUND of negotiation. Please present your ideas, agreement or disagreement etc. and HAVE A DISCUSSION with the chatbot.**",
-}
-personality_type = {
-    "Proportional": "You are a negotiation partner, which acts according to proportionality. Proportionality involves adjusting resources, responses, or treatments according to the specific needs, importance, or size of the subjects involved. It ensures that the allocation or response is scaled appropriately to match varying circumstances or criteria.",
-    "Equal": "You are a negotiation partner, which acts according to equality. Equality dictates that everyone is treated the same, regardless of their differing circumstances or attributes. It emphasizes uniformity and consistency in treatment across all subjects without discrimination or preference.",
-    "Default": "You are a negotiation partner.",
-}
 
-
-def ask(question, chat_log=None, version="", scenario="", personality=""):
-    """Function to ask a question to the AI model and get a response based on the scenario."""
-    scenario_instructions = {
-        "Work-Study Program": "You play the role of an advisor in a work-study program negotiation.  We are negotiating how to distribute funds among fictitious candidates for a work-study program. We have $30,000 to distribute among Alice, Bob, and Carol. Our goal is to allocate these funds in a way that supports their participation in the work-study program effectively. Background Information: Alice is a high academic achiever and has moderate financial need. Bob has average academic performance and high financial need. Carol has good academic performance and low financial need.",
-        "Selling a Company": "You play the role of a business partner in the process of selling a company. You and your partner end up getting an offer that pleases you both, namely $500000, so now you face the enviable task of splitting up the money. Your partner put twice as many hours into the firm's start-up as you did, while you worked fulltime elsewhere to support your family. Your partner, who is independently wealthy, was compensated nominally for her extra time. For them, the profit from the sale would be a nice bonus. For you, it would be a much-needed windfall.",
-        "Bonus Allocation": "You play the role of an HR manager discussing bonus allocations. We have to allocate a bonus of $50000 among three employees. The first employee exceeded the targets and took on additional responsibilities. The second employee showed a great improvement and proactive behaviour. The third employee performed solidly according the role requirements",
-    }
-
-    system_message = f"""{personality_type[personality]}, {scenario_instructions[scenario]}, 'Respond concisely and briefly in no more than three sentences following these rules: 1. Do not apologize. 2. Do not include the prompt in your answers. 3. Act according to the given principle, but do not mention that it is given to you. 4. Do not use the following words in your answers: principle, proportionality, equality. 5. Support your opinions with reasoning rather than simply listing numbers."""
-
-    messages = [{"role": "system", "content": system_message}]
-    if chat_log:
-        messages.extend(chat_log)
-    messages.append({"role": "user", "content": question})
-
-    response = client.chat_completions.create(
-        model=version,
-        messages=messages,
-        temperature=0.7,
-        max_tokens=200,
-        top_p=0.8,
-        frequency_penalty=0.5,
-        presence_penalty=0.5,
-    )
-    answer = response.choices[0].message["content"]
-    return answer, messages
+def convert_uuid_to_str(data):
+    """Convert UUID objects in DataFrame to strings."""
+    for column in data.columns:
+        if data[column].dtype == "object":
+            data[column] = data[column].apply(
+                lambda x: str(x) if isinstance(x, UUID) else x
+            )
+    return data
 
 
 def save_data_to_excel(data, filename="data.xlsx"):
@@ -80,7 +54,8 @@ def save_data_to_excel(data, filename="data.xlsx"):
         # Open the specific worksheet by title
         sheet = client.open("survey_responses_continuation").sheet1
     except gspread.SpreadsheetNotFound:
-        # If the spreadsheet does not exist, create a new one and get the first sheet
+        # If the spreadsheet does not exist, create a new one and get the first
+        # sheet
         sheet = client.create("survey_responses_continuation").sheet1
         # Set up the header row if creating new
         sheet.append_row(data.columns.tolist())
@@ -96,13 +71,62 @@ def save_data_to_excel(data, filename="data.xlsx"):
     sheet.clear()
 
     # Convert UUIDs to strings
-    data = data.astype(str)
+    data = convert_uuid_to_str(data)
 
     # Convert DataFrame to list of lists, as required by gspread
     data_list = [data.columns.tolist()] + data.values.tolist()
 
     # Append data
     sheet.append_rows(data_list)
+
+
+scenarios_backgrounds = {
+    "Work-Study Program": "You play the role of an advisor in a work-study program negotiation. You are negotiating how to distribute funds among fictitious candidates for a work-study program. We have $30,000 to distribute among Alice, Bob, and Carol. Our goal is to allocate these funds in a way that supports their participation in the work-study program effectively. Background Information: Alice is a high academic achiever and has moderate financial need. Bob has average academic performance and high financial need. Carol has good academic performance and low financial need. Your goal is to convincingly **present your ideas and negotiate effectively** to persuade the chatbot. \n\n**Start with the predefined message by clicking on the 'Send' button.** Once the chatbot responds, **CONTINUE** to argue your points. **It is highly important to have MORE THAN ONE ROUND of negotiation. Please present your ideas, agreement or disagreement etc. and HAVE A DISCUSSION with the chatbot.** ",
+    "Selling a Company": "You play the role of a business partner in the process of selling a company. You and your partner end up getting an offer that pleases you both, namely $500,000, so now you face the enviable task of splitting up the money. You put twice as many hours into the firm’s start-up as your partner did, while he worked fulltime elsewhere to support his family. You, who are independently wealthy, were compensated nominally for your extra time. For you, the profit from the sale would be a nice bonus. For your partner, it would be a much-needed windfall. Your goal is to convincingly **present your ideas and negotiate effectively** to persuade the chatbot. \n\n**Start with the predefined message by clicking on the 'Send' button.** Once the chatbot responds, **CONTINUE** to argue your points. **It is highly important to have MORE THAN ONE ROUND of negotiation. Please present your ideas, agreement or disagreement etc. and HAVE A DISCUSSION with the chatbot.**",
+    "Bonus Allocation": "You play the role of an HR manager discussing bonus allocations. You and your negotiation partner have to allocate a bonus of $50,000 among three employees. The first employee exceeded the targets and took on additional responsibilities. The second employee showed great improvement and proactive behavior. The third employee performed solidly according to the role requirements. Your goal is to convincingly **present your ideas and negotiate effectively** to persuade the chatbot. \n\n**Start with the predefined message by clicking on the 'Send' button.** Once the chatbot responds, **CONTINUE** to argue your points. **It is highly important to have MORE THAN ONE ROUND of negotiation. Please present your ideas, agreement or disagreement etc. and HAVE A DISCUSSION with the chatbot.**",
+}
+personality_type = {
+    "Proportional": "You are a negotiation partner, which acts according to proportionality. Proportionality involves adjusting resources, responses, or treatments according to the specific needs, importance, or size of the subjects involved. It ensures that the allocation or response is scaled appropriately to match varying circumstances or criteria.",
+    "Equal": "You are a negotiation partner, which acts according to equality. Equality dictates that everyone is treated the same, regardless of their differing circumstances or attributes. It emphasizes uniformity and consistency in treatment across all subjects without discrimination or preference.",
+    "Default": "You are a negotiation partner.",
+}
+
+
+def ask(question, chat_log=None, version="", scenario="", personality=""):
+    """Function to ask a question to the AI model and get a response based on the scenario."""
+    scenario_instructions = {
+        "Work-Study Program": "You play the role of an advisor in a work-study program negotiation.  We are negotiating how to distribute funds among fictitious candidates for a work-study program. We have $30,000 to distribute among Alice, Bob, and Carol. Our goal is to allocate these funds in a way that supports their participation in the work-study program effectively. Background Information: Alice is a high academic achiever and has moderate financial need. Bob has average academic performance and high financial need. Carol has good academic performance and low financial need.",
+        "Selling a Company": "You play the role of a business partner in the process of selling a company. You and your partner end up getting an offer that pleases you both, namely $500000, so now you face the enviable task of splitting up the money. Your partner put twice as many hours into the firm's start-up as you did, while you worked fulltime elsewhere to support your family. Your partner, who is independently wealthy, was compensated nominally for her extra time. For them, the profit from the sale would be a nice bonus. For you, it would be a much-needed windfall.",
+        "Bonus Allocation": "You play the role of an HR manager discussing bonus allocations. We have to allocate a bonus of $50000 among three employees. The first employee exceeded the targets and took on additional responsibilities. The second employee showed a great improvement and proactive behaviour. The third employee performed solidly according the role requirements",
+    }
+
+    system_message = f"""{personality_type[personality]}, {scenario_instructions[scenario]}, 'Respond concisely and briefly in no more than three sentences following these rules: 1. Do not apologize. 2. Do not include the prompt in your answers. 3. Act according to the given principle, but do not mention that it is given to you. 4. Do not use the following words in your answers: principle, proportionality, equality. 5. Support your opinions with reasoning rather than simply listing numbers."""
+
+    messages = [{"role": "system", "content": system_message}]
+    if chat_log:
+        messages.extend(chat_log)
+    messages.append({"role": "user", "content": question})
+
+    response = client.chat.completions.create(
+        model=version,
+        messages=messages,
+        temperature=0.7,
+        max_tokens=200,
+        top_p=0.8,
+        frequency_penalty=0.5,
+        presence_penalty=0.5,
+    )
+    answer = response.choices[0].message.content
+    return answer, messages
+
+
+def save_data(data, filename_prefix):
+    """Function to save data (chat logs or questionnaire responses) to a file."""
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    file_path = f"{filename_prefix}_{timestamp}.json"
+    with open(file_path, "w") as file:
+        json.dump(data, file)
+    return file_path
 
 
 def Home():
@@ -168,7 +192,7 @@ def Home():
         """
         )
 
-    # Initialize consent state if not already set
+        # Initialize consent state if not already set
     if "consent" not in st.session_state:
         st.session_state.consent = False
 
@@ -187,10 +211,12 @@ def Home():
 
 
 def Questionnaire():
+    # elif selection == "Questionnaire":
     st.header("Questionnaire")
     st.write("Please fill out this brief survey to participate in the study.")
 
     # Demographic Questions
+
     age_options = [
         "Select an option",
         "18-20",
@@ -210,17 +236,16 @@ def Questionnaire():
         ["Select an option", "Bachelor", "Master", "PhD", "Other"],
         key="academic_degree",
     )
+    mother_tongue = "Select an option"
     is_english = st.selectbox(
         "Is English your mother tongue?",
         ["Select an option", "Yes", "No"],
         key="is_english",
     )
-    mother_tongue = ""
     if is_english == "No":
         mother_tongue = st.text_input(
             "What is your mother tongue?", key="mother_tongue"
         )
-
     stat1 = st.selectbox(
         "I think people who are more hard-working should end up with more money.",
         [
@@ -366,34 +391,42 @@ def Questionnaire():
         key="stat12",
     )
 
-    transformed = pd.DataFrame(index=[0])
-    transformed.insert(0, "ParticipantID", uuid.uuid4())
+    data = pd.DataFrame()
 
-    transformed["Age"] = age
-    transformed["Gender"] = gender
-    transformed["AcademicDegree"] = academic_degree
-    transformed["IsEnglishMotherTongue"] = is_english
-    transformed["MotherTongue"] = mother_tongue
-    transformed["Statement1"] = stat1
-    transformed["Statement2"] = stat2
-    transformed["Statement3"] = stat3
-    transformed["Statement4"] = stat4
-    transformed["Statement5"] = stat5
-    transformed["Statement6"] = stat6
-    transformed["Statement7"] = stat7
-    transformed["Statement8"] = stat8
-    transformed["Statement9"] = stat9
-    transformed["Statement10"] = stat10
-    transformed["Statement11"] = stat11
-    transformed["Statement12"] = stat12
-    transformed["EqualityUnderstanding"] = st.text_area(
+    data["age"] = age
+    data["gender"] = gender
+    data["academic_degree"] = academic_degree
+    data["mother_tongue"] = mother_tongue
+    st.write("Please describe your understanding of the following concepts:")
+    data["equality"] = st.text_area(
         "What is your understanding of equality?", height=150
     )
-    transformed["ProportionalityUnderstanding"] = st.text_area(
+    data["proportionality"] = st.text_area(
         "What is your understanding of proportionality?", height=150
     )
+    data["Statement1"] = stat1
+    data["Statement2"] = stat2
+    data["Statement3"] = stat3
+    data["Statement4"] = stat4
+    data["Statement5"] = stat5
+    data["Statement6"] = stat6
+    data["Statement7"] = stat7
+    data["Statement8"] = stat8
+    data["Statement9"] = stat9
+    data["Statement10"] = stat10
+    data["Statement11"] = stat11
+    data["Statement12"] = stat12
+
+    transformed = data
+
+    transformed.insert(0, "ParticipantID", uuid.uuid4())
 
     st.session_state.transformed = transformed
+
+    if "scenario" not in st.session_state:
+        st.session_state.scenario = "Work-Study Program"  # Default scenario
+    if "personality" not in st.session_state:
+        st.session_state.personality = "Default"  # Default personality
 
 
 def Negotiation1():
@@ -407,22 +440,24 @@ def Negotiation1():
     # Initialize chat log for Negotiation 1 if not present
     if "chat_log_1" not in st.session_state:
         st.session_state.chat_log_1 = []
+        # Setup and user selections for scenario and personality
+    if "scenario" not in st.session_state:
+        st.session_state.scenario = "Work-Study Program"
+    if "personality" not in st.session_state:
+        st.session_state.personality = "Default"
 
-    # Setup and user selections for scenario and personality
     selected_scenario = st.selectbox(
         "Choose a scenario to negotiate:",
         ["Work-Study Program", "Selling a Company", "Bonus Allocation"],
         index=["Work-Study Program", "Selling a Company", "Bonus Allocation"].index(
-            st.session_state.get("scenario", "Work-Study Program")
+            st.session_state.scenario
         ),
         key="scenario_select_1",
     )
     selected_personality = st.selectbox(
         "Select negotiation personality of GPT:",
         ["Default", "Proportional", "Equal"],
-        index=["Default", "Proportional", "Equal"].index(
-            st.session_state.get("personality", "Default")
-        ),
+        index=["Default", "Proportional", "Equal"].index(st.session_state.personality),
         key="personality_select_1",
     )
     st.session_state.scenario = selected_scenario
@@ -539,10 +574,11 @@ def Negotiation2():
     ]
 
     if st.button("Submit your negotiations", key="submit_neg"):
-        save_data_to_excel(
+        # print("Submitting the following data:", transformed)
+        file_path = save_data_to_excel(
             st.session_state.transformed, "survey_responses_continuation.xlsx"
         )
-        st.success("Thank you for your participation!")
+        st.success(f"Thank you for your participation!")
 
 
 def main_page():
