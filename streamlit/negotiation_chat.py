@@ -587,8 +587,6 @@ def Questionnaire():
         "mother_tongue": [
             mother_tongue if mother_tongue != "Select an option" else None
         ],
-        "equality": [equality] if equality else [""],
-        "proportionality": [proportionality] if proportionality else [""],
         "Statement1": [stat1 if stat1 != "Select an option" else None],
         "Statement2": [stat2 if stat2 != "Select an option" else None],
         "Statement3": [stat3 if stat3 != "Select an option" else None],
@@ -601,6 +599,8 @@ def Questionnaire():
         "Statement10": [stat10 if stat10 != "Select an option" else None],
         "Statement11": [stat11 if stat11 != "Select an option" else None],
         "Statement12": [stat12 if stat12 != "Select an option" else None],
+        "equality": [equality] if equality else [""],
+        "proportionality": [proportionality] if proportionality else [""],
     }
 
     st.session_state.transformed = pd.DataFrame(data)
