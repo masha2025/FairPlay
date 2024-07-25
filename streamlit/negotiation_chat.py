@@ -50,6 +50,12 @@ def save_data_to_excel(data, sheet_name="survey_responses2"):
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
 
+    # Convert UUIDs to strings before appending
+    data = convert_uuid_to_str(data)
+
+    # Convert DataFrame to list of lists, as required by gspread
+    data_list = [data.columns.tolist()] + data.astype(str).values.tolist()
+
     try:
         # Open the specific worksheet by title
         sheet = client.open(sheet_name).sheet1
@@ -58,18 +64,9 @@ def save_data_to_excel(data, sheet_name="survey_responses2"):
         sheet = client.create(sheet_name).sheet1
         # Set up the header row if creating new
         sheet.append_row(data.columns.tolist())
-
-    # Clear the sheet before appending new data to avoid duplicates
-    sheet.clear()
-
-    # Convert UUIDs to strings
-    data = convert_uuid_to_str(data)
-
-    # Convert DataFrame to list of lists, as required by gspread
-    data_list = [data.columns.tolist()] + data.astype(str).values.tolist()
-
-    # Append data
-    sheet.append_rows(data_list)
+    else:
+        # Append data without clearing the sheet
+        sheet.append_rows(data_list)
 
 
 scenarios_backgrounds = {
