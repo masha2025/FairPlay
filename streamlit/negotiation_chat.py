@@ -7,18 +7,36 @@ import json
 import gspread
 from streamlit_extras.switch_page_button import switch_page
 from oauth2client.service_account import ServiceAccountCredentials
-
+import logging
 
 import uuid
 from uuid import UUID
 
 client = OpenAI(api_key=os.getenv("API_KEY"))
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 
 def convert_uuid_to_str(data):
     """Convert UUID objects in DataFrame to strings."""
     for column in data.columns:
         if data[column].dtype == "object":
+            data[column] = data[column].apply(
+                lambda x: str(x) if isinstance(x, UUID) else x
+            )
+    return data
+
+
+def convert_to_json_compatible(data):
+    """Convert DataFrame to JSON compatible format."""
+    for column in data.columns:
+        if data[column].dtype == "datetime64[ns]":
+            data[column] = data[column].apply(
+                lambda x: x.isoformat() if pd.notnull(x) else ""
+            )
+        elif data[column].dtype == "object":
             data[column] = data[column].apply(
                 lambda x: str(x) if isinstance(x, UUID) else x
             )
@@ -68,14 +86,21 @@ def save_data_to_excel(data, filename="data.xlsx"):
     # Clear the sheet before appending new data to avoid duplicates
     sheet.clear()
 
-    # Convert UUIDs to strings
-    data = convert_uuid_to_str(data)
+    # Convert UUIDs and datetime objects to strings
+    data = convert_to_json_compatible(data)
 
     # Convert DataFrame to list of lists, as required by gspread
     data_list = [data.columns.tolist()] + data.values.tolist()
 
-    # Append data
-    sheet.append_rows(data_list)
+    # Log the data being sent
+    logger.debug(f"Data being sent to Google Sheets: {data_list}")
+
+    try:
+        # Append data
+        sheet.append_rows(data_list)
+    except Exception as e:
+        logger.error(f"Failed to append rows: {e}")
+        raise
 
 
 scenarios_backgrounds = {
