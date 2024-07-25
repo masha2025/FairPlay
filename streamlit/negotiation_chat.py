@@ -26,7 +26,7 @@ def convert_uuid_to_str(data):
     return data
 
 
-def save_data_to_excel(df, sheet_name="survey_responses2"):
+def save_data_to_excel(data, filename="data.xlsx"):
     # Setup the connection to Google Sheets
     scope = [
         "https://spreadsheets.google.com/feeds",
@@ -52,18 +52,28 @@ def save_data_to_excel(df, sheet_name="survey_responses2"):
 
     try:
         # Open the specific worksheet by title
-        sheet = client.open(sheet_name).sheet1
+        sheet = client.open("survey_responses").sheet1
     except gspread.SpreadsheetNotFound:
         # If the spreadsheet does not exist, create a new one and get the first sheet
-        sheet = client.create(sheet_name).sheet1
+        sheet = client.create("survey_responses").sheet1
         # Set up the header row if creating new
-        sheet.append_row(df.columns.tolist())
+        sheet.append_row(data.columns.tolist())
+
+    # Read existing data as DataFrame
+    existing_data = pd.DataFrame(sheet.get_all_records())
+
+    # Concatenate new data
+    if not existing_data.empty:
+        data = pd.concat([existing_data, data], ignore_index=True)
 
     # Clear the sheet before appending new data to avoid duplicates
     sheet.clear()
 
+    # Convert UUIDs to strings
+    data = convert_uuid_to_str(data)
+
     # Convert DataFrame to list of lists, as required by gspread
-    data_list = [df.columns.tolist()] + df.astype(str).values.tolist()
+    data_list = [data.columns.tolist()] + data.values.tolist()
 
     # Append data
     sheet.append_rows(data_list)
