@@ -23,16 +23,6 @@ client = OpenAI(api_key=os.getenv("API_KEY"))
 # client_secret = st.secrets["client_secret"]
 
 
-def convert_uuid_to_str(data):
-    """Convert UUID objects in DataFrame to strings."""
-    for column in data.columns:
-        if data[column].dtype == "object":
-            data[column] = data[column].apply(
-                lambda x: str(x) if isinstance(x, UUID) else x
-            )
-    return data
-
-
 def save_data_to_excel(data, filename="data.xlsx"):
     # Setup the connection to Google Sheets
     scope = [
@@ -75,9 +65,6 @@ def save_data_to_excel(data, filename="data.xlsx"):
 
     # Clear the sheet before appending new data to avoid duplicates
     sheet.clear()
-
-    # Convert UUIDs to strings
-    data = convert_uuid_to_str(data)
 
     # Convert DataFrame to list of lists, as required by gspread
     data_list = [data.columns.tolist()] + data.values.tolist()
@@ -237,7 +224,7 @@ def Questionnaire():
     st.write("Please fill out this brief survey to participate in the study.")
 
     # Demographic Questions
-    data = {}
+
     age_options = [
         "Select an option",
         "18-20",
@@ -414,10 +401,10 @@ def Questionnaire():
     )
 
     st.write("Please describe your understanding of the following concepts:")
-    data["equality"] = st.text_area(
+    transformed["equality"] = st.text_area(
         "What is your understanding of equality?", height=150
     )
-    data["proportionality"] = st.text_area(
+    transformed["proportionality"] = st.text_area(
         "What is your understanding of proportionality?", height=150
     )
     transformed = pd.DataFrame(index=[0])
