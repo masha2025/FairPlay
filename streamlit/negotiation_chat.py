@@ -380,42 +380,34 @@ def Questionnaire():
         key="stat12",
     )
 
-    data = pd.DataFrame()
+    # DataFrame creation
+    data = {
+        "ParticipantID": [str(uuid.uuid4())],
+        "age": [age],
+        "gender": [gender],
+        "academic_degree": [academic_degree],
+        "mother_tongue": [mother_tongue],
+        "equality": [
+            st.text_area("What is your understanding of equality?", height=150)
+        ],
+        "proportionality": [
+            st.text_area("What is your understanding of proportionality?", height=150)
+        ],
+        "Statement1": [stat1],
+        "Statement2": [stat2],
+        "Statement3": [stat3],
+        "Statement4": [stat4],
+        "Statement5": [stat5],
+        "Statement6": [stat6],
+        "Statement7": [stat7],
+        "Statement8": [stat8],
+        "Statement9": [stat9],
+        "Statement10": [stat10],
+        "Statement11": [stat11],
+        "Statement12": [stat12],
+    }
 
-    data["age"] = age
-    data["gender"] = gender
-    data["academic_degree"] = academic_degree
-    data["mother_tongue"] = mother_tongue
-    st.write("Please describe your understanding of the following concepts:")
-    data["equality"] = st.text_area(
-        "What is your understanding of equality?", height=150
-    )
-    data["proportionality"] = st.text_area(
-        "What is your understanding of proportionality?", height=150
-    )
-    data["Statement1"] = stat1
-    data["Statement2"] = stat2
-    data["Statement3"] = stat3
-    data["Statement4"] = stat4
-    data["Statement5"] = stat5
-    data["Statement6"] = stat6
-    data["Statement7"] = stat7
-    data["Statement8"] = stat8
-    data["Statement9"] = stat9
-    data["Statement10"] = stat10
-    data["Statement11"] = stat11
-    data["Statement12"] = stat12
-
-    transformed = data
-
-    transformed.insert(0, "ParticipantID", uuid.uuid4())
-
-    st.session_state.transformed = transformed
-
-    if "scenario" not in st.session_state:
-        st.session_state.scenario = "Work-Study Program"  # Default scenario
-    if "personality" not in st.session_state:
-        st.session_state.personality = "Default"  # Default personality
+    st.session_state.transformed = pd.DataFrame(data)
 
 
 def Negotiation1():
