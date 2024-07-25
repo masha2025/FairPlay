@@ -59,11 +59,21 @@ def save_data_to_excel(data):
         # Set up the header row if creating new
         sheet.append_row(data.columns.tolist())
 
+    # Read existing data as DataFrame
+    existing_data = pd.DataFrame(sheet.get_all_records())
+
+    # Concatenate new data
+    if not existing_data.empty:
+        data = pd.concat([existing_data, data], ignore_index=True)
+
+    # Clear the sheet before appending new data to avoid duplicates
+    sheet.clear()
+
     # Convert UUIDs to strings
     data = convert_uuid_to_str(data)
 
     # Convert DataFrame to list of lists, as required by gspread
-    data_list = [data.columns.tolist()] + data.astype(str).values.tolist()
+    data_list = [data.columns.tolist()] + data.values.tolist()
 
     # Append data
     sheet.append_rows(data_list)
