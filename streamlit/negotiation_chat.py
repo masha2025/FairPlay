@@ -14,29 +14,11 @@ from uuid import UUID
 
 client = OpenAI(api_key=os.getenv("API_KEY"))
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
 
 def convert_uuid_to_str(data):
     """Convert UUID objects in DataFrame to strings."""
     for column in data.columns:
         if data[column].dtype == "object":
-            data[column] = data[column].apply(
-                lambda x: str(x) if isinstance(x, UUID) else x
-            )
-    return data
-
-
-def convert_to_json_compatible(data):
-    """Convert DataFrame to JSON compatible format."""
-    for column in data.columns:
-        if data[column].dtype == "datetime64[ns]":
-            data[column] = data[column].apply(
-                lambda x: x.isoformat() if pd.notnull(x) else ""
-            )
-        elif data[column].dtype == "object":
             data[column] = data[column].apply(
                 lambda x: str(x) if isinstance(x, UUID) else x
             )
@@ -69,10 +51,10 @@ def save_data_to_excel(data, filename="data.xlsx"):
 
     try:
         # Open the specific worksheet by title
-        sheet = client.open("survey_responses2").sheet1
+        sheet = client.open("survey_responses").sheet1
     except gspread.SpreadsheetNotFound:
         # If the spreadsheet does not exist, create a new one and get the first sheet
-        sheet = client.create("survey_responses2").sheet1
+        sheet = client.create("survey_responses").sheet1
         # Set up the header row if creating new
         sheet.append_row(data.columns.tolist())
 
@@ -86,21 +68,14 @@ def save_data_to_excel(data, filename="data.xlsx"):
     # Clear the sheet before appending new data to avoid duplicates
     sheet.clear()
 
-    # Convert UUIDs and datetime objects to strings
-    data = convert_to_json_compatible(data)
+    # Convert UUIDs to strings
+    data = convert_uuid_to_str(data)
 
     # Convert DataFrame to list of lists, as required by gspread
     data_list = [data.columns.tolist()] + data.values.tolist()
 
-    # Log the data being sent
-    logger.debug(f"Data being sent to Google Sheets: {data_list}")
-
-    try:
-        # Append data
-        sheet.append_rows(data_list)
-    except Exception as e:
-        logger.error(f"Failed to append rows: {e}")
-        raise
+    # Append data
+    sheet.append_rows(data_list)
 
 
 scenarios_backgrounds = {
@@ -468,7 +443,9 @@ def Negotiation1():
         st.session_state.scenario = "Work-Study Program"
     if "personality" not in st.session_state:
         st.session_state.personality = "Default"
-
+    # if 'scenario_saved' not in st.session_state:
+    #     st.session_state.scenario_saved = "Work-Study Program"
+    # Setup and user selections for scenario and personality
     selected_scenario = st.selectbox(
         "Choose a scenario to negotiate:",
         ["Work-Study Program", "Selling a Company", "Bonus Allocation"],
@@ -599,9 +576,52 @@ def Negotiation2():
     if st.button("Submit your negotiations", key="submit_neg"):
         # print("Submitting the following data:", transformed)
         file_path = save_data_to_excel(
-            st.session_state.transformed, "survey_responses_continuation.xlsx"
+            st.session_state.transformed, "survey_responses.xlsx"
         )
         st.success(f"Thank you for your participation!")
+
+
+# if __name__ == "__main__":
+#     main()
+# Main Page Logic
+# Main Page Logic
+# def main_page():
+#     st.sidebar.title("Navigation")
+#     selection = st.sidebar.radio("Go to", ["Home", "Questionnaire", "Negotiation 1", "Negotiation 2"])
+
+#     if selection == "Home":
+#         st.session_state.runpage = "Home"
+#     elif selection == "Questionnaire":
+#         st.session_state.runpage = "Questionnaire"
+#     elif selection == "Negotiation 1":
+#         st.session_state.runpage = "Negotiation 1"
+#     elif selection == "Negotiation 2":
+#         st.session_state.runpage = "Negotiation 2"
+
+# def main_page():
+#     st.sidebar.title("Navigation")
+#     selection = st.sidebar.radio("Go to", ["Home", "Questionnaire", "Negotiation 1", "Negotiation 2"])
+
+#     if selection == "Home":
+#         st.session_state.runpage = "Home"
+#     elif selection == "Questionnaire":
+#         st.session_state.runpage = "Questionnaire"
+#     elif selection == "Negotiation 1":
+#         st.session_state.runpage = "Negotiation 1"
+#     elif selection == "Negotiation 2":
+#         st.session_state.runpage = "Negotiation 2"
+
+#     if 'runpage' not in st.session_state:
+#         st.session_state.runpage = "Home"  # Set Home as the default page
+
+#     if st.session_state.runpage == "Home":
+#         Home()
+#     elif st.session_state.runpage == "Questionnaire":
+#         Questionnaire()
+#     elif st.session_state.runpage == "Negotiation 1":
+#         Negotiation1()
+#     elif st.session_state.runpage == "Negotiation 2":
+#         Negotiation2()
 
 
 def main_page():
