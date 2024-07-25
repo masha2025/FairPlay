@@ -1895,17 +1895,6 @@ files = [
 six = ">=1.5"
 
 [[package]]
-name = "python-decouple"
-version = "3.8"
-description = "Strict separation of settings from code."
-optional = false
-python-versions = "*"
-files = [
-    {file = "python-decouple-3.8.tar.gz", hash = "sha256:ba6e2657d4f376ecc46f77a3a615e058d93ba5e465c01bbe57289bfb7cce680f"},
-    {file = "python_decouple-3.8-py3-none-any.whl", hash = "sha256:d0d45340815b25f4de59c974b855bb38d03151d81b037d9e3f463b0c9f8cbd66"},
-]
-
-[[package]]
 name = "pytz"
 version = "2024.1"
 description = "World timezone definitions, modern and historical"
@@ -2282,22 +2271,6 @@ watchdog = {version = ">=2.1.5,<5", markers = "platform_system != \"Darwin\""}
 snowflake = ["snowflake-connector-python (>=2.8.0)", "snowflake-snowpark-python (>=0.9.0)"]
 
 [[package]]
-name = "streamlit-aggrid"
-version = "0.3.4.post3"
-description = "Streamlit component implementation of ag-grid"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "streamlit-aggrid-0.3.4.post3.tar.gz", hash = "sha256:0cb9332199e7735289a673efabc913e1a3466cc188bc025bec2c50c32ab1989a"},
-    {file = "streamlit_aggrid-0.3.4.post3-py3-none-any.whl", hash = "sha256:b909117eb90cfdb855b1c74e694e9ec97554c101baaafb7339eaf885d1f4e49c"},
-]
-
-[package.dependencies]
-pandas = ">=1.2"
-python-decouple = ">=3.6,<4.0"
-streamlit = ">=0.87.0"
-
-[[package]]
 name = "streamlit-camera-input-live"
 version = "0.2.0"
 description = "Alternative version of st.camera_input which returns the webcam images live, without any button press needed"
@@ -2622,4 +2595,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "bb3a61c716b3a246544b214a0a20d33d50e1deb6c20d12af0377adaa77395d7e"
+content-hash = "d949a87285cba0e148e04a3a7c191041a0259cee381dae83bc2bb1576a95421c"
