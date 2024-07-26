@@ -26,8 +26,7 @@ def convert_uuid_to_str(data):
     return data
 
 
-def save_data_to_excel(data, filename="data.xlsx"):
-    # Setup the connection to Google Sheets
+def save_data_to_google_sheet(dataframe, sheet_name):
     scope = [
         "https://spreadsheets.google.com/feeds",
         "https://www.googleapis.com/auth/drive",
@@ -47,36 +46,24 @@ def save_data_to_excel(data, filename="data.xlsx"):
         ],
         "client_x509_cert_url": st.secrets["service_account"]["client_x509_cert_url"],
     }
+
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
 
-    try:
-        # Open the specific worksheet by title
-        sheet = client.open("survey_responses2").sheet1
-    except gspread.SpreadsheetNotFound:
-        # If the spreadsheet does not exist, create a new one and get the first sheet
-        sheet = client.create("survey_responses2").sheet1
-        # Set up the header row if creating new
-        sheet.append_row(data.columns.tolist())
+    # Open the Google Sheet
+    sheet = client.open(sheet_name).sheet1  # Open the first sheet of the workbook
 
-    # Read existing data as DataFrame
-    existing_data = pd.DataFrame(sheet.get_all_records())
+    # Convert the dataframe to a list of lists
+    data_list = dataframe.values.tolist()
 
-    # Concatenate new data
-    if not existing_data.empty:
-        data = pd.concat([existing_data, data], ignore_index=True)
-
-    # Clear the sheet before appending new data to avoid duplicates
-    sheet.clear()
-
-    # Convert UUIDs to strings
-    data = convert_uuid_to_str(data)
-
-    # Convert DataFrame to list of lists, as required by gspread
-    data_list = [data.columns.tolist()] + data.values.tolist()
-
-    # Append data
+    # Append the data to the sheet
     sheet.append_rows(data_list)
+
+
+def save_data_to_excel(dataframe, file_name):
+    # Save dataframe to an Excel file
+    dataframe.to_excel(file_name, index=False)
+    return file_name
 
 
 scenarios_backgrounds = {
@@ -763,6 +750,7 @@ def Negotiation2():
         file_path = save_data_to_excel(
             st.session_state.transformed, "survey_responses2.xlsx"
         )
+        save_data_to_google_sheet(st.session_state.transformed, "survey_responses2")
         st.success(f"Thank you for your participation!")
 
 
