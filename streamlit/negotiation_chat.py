@@ -241,7 +241,7 @@ def Questionnaire():
         ["Select an option", "Bachelor", "Master", "PhD", "Other"],
         key="academic_degree",
     )
-    mother_tongue = "Select an option"
+
     is_english = st.selectbox(
         "Is English your mother tongue?",
         ["Select an option", "Yes", "No"],
@@ -429,7 +429,7 @@ def Questionnaire():
     mother_tongue = (
         st.text_input("What is your mother tongue?", key="mother_tongue")
         if is_english == "No"
-        else "English"
+        else "Select an option"
     )
 
     # Statements
@@ -585,22 +585,30 @@ def Questionnaire():
     # DataFrame creation with validation
     data = {
         "ParticipantID": [str(uuid.uuid4())],
-        "age": [age],
-        "gender": [gender],
-        "academic_degree": [academic_degree],
-        "mother_tongue": [mother_tongue],
-        "Statement1": [stat1],
-        "Statement2": [stat2],
-        "Statement3": [stat3],
-        "Statement4": [stat4],
-        "Statement5": [stat5],
-        "Statement6": [stat6],
-        "Statement7": [stat7],
-        "Statement8": [stat8],
-        "Statement9": [stat9],
-        "Statement10": [stat10],
-        "Statement11": [stat11],
-        "Statement12": [stat12],
+        "age": [age if age != "Select an option" else "Select an option"],
+        "gender": [gender if gender != "Select an option" else "Select an option"],
+        "academic_degree": [
+            (
+                academic_degree
+                if academic_degree != "Select an option"
+                else "Select an option"
+            )
+        ],
+        "mother_tongue": [
+            mother_tongue if mother_tongue != "Select an option" else "Select an option"
+        ],
+        "Statement1": [stat1 if stat1 != "Select an option" else "Not_Selected"],
+        "Statement2": [stat2 if stat2 != "Select an option" else "Not_Selected"],
+        "Statement3": [stat3 if stat3 != "Select an option" else "Not_Selected"],
+        "Statement4": [stat4 if stat4 != "Select an option" else "Not_Selected"],
+        "Statement5": [stat5 if stat5 != "Select an option" else "Not_Selected"],
+        "Statement6": [stat6 if stat6 != "Select an option" else "Not_Selected"],
+        "Statement7": [stat7 if stat7 != "Select an option" else "Not_Selected"],
+        "Statement8": [stat8 if stat8 != "Select an option" else "Not_Selected"],
+        "Statement9": [stat9 if stat9 != "Select an option" else "Not_Selected"],
+        "Statement10": [stat10 if stat10 != "Select an option" else "Not_Selected"],
+        "Statement11": [stat11 if stat11 != "Select an option" else "Not_Selected"],
+        "Statement12": [stat12 if stat12 != "Select an option" else "Not_Selected"],
         "equality": [equality] if equality else [""],
         "proportionality": [proportionality] if proportionality else [""],
     }
