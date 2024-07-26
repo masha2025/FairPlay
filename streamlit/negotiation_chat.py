@@ -595,9 +595,7 @@ def Questionnaire():
                 else "Select an option"
             )
         ],
-        "mother_tongue": [
-            mother_tongue if mother_tongue != "Select an option" else "Select an option"
-        ],
+        "mother_tongue": [mother_tongue],
         "Statement1": [stat1 if stat1 != "Select an option" else "Not_Selected"],
         "Statement2": [stat2 if stat2 != "Select an option" else "Not_Selected"],
         "Statement3": [stat3 if stat3 != "Select an option" else "Not_Selected"],
