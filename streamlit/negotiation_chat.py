@@ -32,19 +32,32 @@ def save_data_to_google_sheet(dataframe, sheet_name):
         "https://www.googleapis.com/auth/drive",
     ]
 
+    # creds_dict = {
+    #     "type": st.secrets["service_account"]["type"],
+    #     "project_id": st.secrets["service_account"]["project_id"],
+    #     "private_key_id": st.secrets["service_account"]["private_key_id"],
+    #     "private_key": st.secrets["service_account"]["private_key"],
+    #     "client_email": st.secrets["service_account"]["client_email"],
+    #     "client_id": st.secrets["service_account"]["client_id"],
+    #     "auth_uri": st.secrets["service_account"]["auth_uri"],
+    #     "token_uri": st.secrets["service_account"]["token_uri"],
+    #     "auth_provider_x509_cert_url": st.secrets["service_account"][
+    #         "auth_provider_x509_cert_url"
+    #     ],
+    #     "client_x509_cert_url": st.secrets["service_account"]["client_x509_cert_url"],
+    # }
+
     creds_dict = {
-        "type": st.secrets["service_account"]["type"],
-        "project_id": st.secrets["service_account"]["project_id"],
-        "private_key_id": st.secrets["service_account"]["private_key_id"],
-        "private_key": st.secrets["service_account"]["private_key"],
-        "client_email": st.secrets["service_account"]["client_email"],
-        "client_id": st.secrets["service_account"]["client_id"],
-        "auth_uri": st.secrets["service_account"]["auth_uri"],
-        "token_uri": st.secrets["service_account"]["token_uri"],
-        "auth_provider_x509_cert_url": st.secrets["service_account"][
-            "auth_provider_x509_cert_url"
-        ],
-        "client_x509_cert_url": st.secrets["service_account"]["client_x509_cert_url"],
+        "type": "service_account",
+        "project_id": "collectingdata-425317",
+        "private_key_id": "53253943fea0e20825c747cd6efe4ced2d0a3531",
+        "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCdkCh06AcwobQ1\nHTBodsgNwJ4FAF6Tw6VdyaFI8q1lL/FvbA6ps95v0Q1aD51mO+j2FZKnYwXQUQ25\nl8UIbivIr8nYiFq1L5Hmdk7ZSEA7JY6br7hTCHyBjnXH+c8tVUZCLVS2I0LahFwj\nY44imz06/wk2V4hgjYegqumCrQGYO/Ro3GNkXW/nRmqYIbTtkUQFMEJhRNGrPQYX\ntAZDLv1sx2fI7uxRlwq2Xxz41REiG0A4c8iwebup+QYHG/vuBUoRbhErbl0YgaDJ\ntaWSD8Dl1PkmB0s2c4bfO981BN0LCOwRVFNJyfmYNc81rdI5kOfT6gjPjbPijUBw\nZtiS7X4ZAgMBAAECggEAEnlv6O84wpi/NLgYsDL3N3eVf6AgtsIqnlHRLai4sIPb\n0vTwTjEXHHS+VEg+7BkLsmjqomI/sQKD8bYsJdYnH5eO+urX+eUbPhKyoZLxZw37\nB+GlYuT8lkNCJ6Gwi0/zljhS9a0yPkVlOUgHxyJ9HjD/n0XJqYqGs82+ZfJLnNIB\ntu/YUaQHteEV56ExGmWBsC4cTrmH+8GiZoCWuMKQE79nW84E4tKk/OOtCFDwQeDr\nvH/MShDXziNAHux19Tb5Ej6026965JlfWtD2J4jf0h09pJoFSUs/XtJlFNcvOLe5\npRMlZQcp6gr/z41yPERNVDz/fSP6eCHT3WswMrMWRQKBgQDLpqEGPLVKowYg9jd3\nmm0jeykDSFNowYoiMqb6cXXTuO5f1vzz8TQawdtx6Y8QJ/hidXhSKbaRwn+CydvJ\ngmBXPeU9jLTlljJ3k4S/PyE1E82ZNOpegJbUl+UMRYsLBFvZd4IvArQxa6jU5FQ5\nI+GZtI0DTWtg2wlvTj1AKz7dhQKBgQDGELHfhD5zYFvpse+txJdisCFusXjpRiCG\nObAU8biaGt/umAYnFtnk/C38Ibj4mJ4YH6nGCXXrR/pMp8OcjC264ABsdssrzFwB\nYsF8wetgs/foeLdAVkOM+NUEBGFj4+nrJ4Qehmotxw9LPOk74RIsGSwsn61aIUyQ\nc+P2m0tIhQKBgA/RFzyGxoXPd5BjzxcI9WUGEb9hhKjkLzhMus9EtKQG/uyOpALG\nPwe8+rA0NZpJoG71NK0c9EMJ2iFsUBesepMMCZvoK7yRF8ZVvL+lxYx7x0IY7AL+\n9bf5PB7h39SxN/kB4SiJizkzZV9zhF8TvFfVwAX7o1VYbbkpWHR9Z1qJAoGAP27H\nWLtkuNTKevzGsxM8HJomCuqBu8v+zJ4bG4oSwiALScGcbtZtsF1naNFwCQXv0/AI\nEmmjP1gM/JHaHv/yAWCOIi6lgQBxEuyK5SbB+HWK1wQaRFucRMDIkAHLIw+yMeK0\n+IW56bFP35vBYrEBfegN8ris7yms+LJ09tzjbnUCgYA05WzDRZ0BjLsvg12ZQUvT\ndkRPwgWGgxlIx7Ufz7r1iqw+opvYmtyBQnrRiIuv35wOHnGEAkz3UACvcoUeN/fb\nZA7m9+bNXXQSCHyjbgheVM7Yqmlpdvqli/U18XIgCkPJrWzggpA2KSkbSsRZflzH\nF12XhsgpjoF2OUyDb0Xfpw==\n-----END PRIVATE KEY-----\n",
+        "client_email": "collectdata@collectingdata-425317.iam.gserviceaccount.com",
+        "client_id": "116414323007506518341",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/collectdata%40collectingdata-425317.iam.gserviceaccount.com",
     }
 
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
@@ -53,11 +66,17 @@ def save_data_to_google_sheet(dataframe, sheet_name):
     # Open the Google Sheet
     sheet = client.open(sheet_name).sheet1  # Open the first sheet of the workbook
 
-    # Convert the dataframe to a list of lists
+    # Convert the DataFrame to a list of lists
     data_list = dataframe.values.tolist()
 
     # Append the data to the sheet
     sheet.append_rows(data_list)
+
+    # Debug: Print the DataFrame to ensure it has data
+    # st.write("DataFrame to be saved:", dataframe)
+
+    # Debug: Print the list of lists to ensure conversion is correct
+    # st.write("Data to be appended:", data_list)
 
 
 def save_data_to_excel(dataframe, file_name):
@@ -566,26 +585,22 @@ def Questionnaire():
     # DataFrame creation with validation
     data = {
         "ParticipantID": [str(uuid.uuid4())],
-        "age": [age if age != "Select an option" else None],
-        "gender": [gender if gender != "Select an option" else None],
-        "academic_degree": [
-            academic_degree if academic_degree != "Select an option" else None
-        ],
-        "mother_tongue": [
-            mother_tongue if mother_tongue != "Select an option" else None
-        ],
-        "Statement1": [stat1 if stat1 != "Select an option" else None],
-        "Statement2": [stat2 if stat2 != "Select an option" else None],
-        "Statement3": [stat3 if stat3 != "Select an option" else None],
-        "Statement4": [stat4 if stat4 != "Select an option" else None],
-        "Statement5": [stat5 if stat5 != "Select an option" else None],
-        "Statement6": [stat6 if stat6 != "Select an option" else None],
-        "Statement7": [stat7 if stat7 != "Select an option" else None],
-        "Statement8": [stat8 if stat8 != "Select an option" else None],
-        "Statement9": [stat9 if stat9 != "Select an option" else None],
-        "Statement10": [stat10 if stat10 != "Select an option" else None],
-        "Statement11": [stat11 if stat11 != "Select an option" else None],
-        "Statement12": [stat12 if stat12 != "Select an option" else None],
+        "age": [age],
+        "gender": [gender],
+        "academic_degree": [academic_degree],
+        "mother_tongue": [mother_tongue],
+        "Statement1": [stat1],
+        "Statement2": [stat2],
+        "Statement3": [stat3],
+        "Statement4": [stat4],
+        "Statement5": [stat5],
+        "Statement6": [stat6],
+        "Statement7": [stat7],
+        "Statement8": [stat8],
+        "Statement9": [stat9],
+        "Statement10": [stat10],
+        "Statement11": [stat11],
+        "Statement12": [stat12],
         "equality": [equality] if equality else [""],
         "proportionality": [proportionality] if proportionality else [""],
     }
@@ -747,10 +762,9 @@ def Negotiation2():
 
     if st.button("Submit your negotiations", key="submit_neg"):
         # print("Submitting the following data:", transformed)
-        file_path = save_data_to_excel(
-            st.session_state.transformed, "survey_responses2.xlsx"
+        file_path = save_data_to_google_sheet(
+            st.session_state.transformed, "survey_responses2"
         )
-        save_data_to_google_sheet(st.session_state.transformed, "survey_responses2")
         st.success(f"Thank you for your participation!")
 
 
