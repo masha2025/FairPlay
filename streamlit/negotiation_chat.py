@@ -422,6 +422,7 @@ def Questionnaire():
         key="academic_degree",
     )
 
+    mother_tongue = "Select an option"
     is_english = st.selectbox(
         "Is English your mother tongue?",
         ["Select an option", "Yes", "No"],
