@@ -157,7 +157,6 @@ def Home():
         This study is conducted by Veronika Tsishetska and Dr. Meltem Aksoy. If you have any questions or need further clarification, feel free to contact us at veronika.tsishetska@tu-dortmund.de and meltem.aksoy@tu-dortmund.de.
 
         Thank you for your time and valuable contribution. 
-        P.S: This survey contains credits to get free survey responses at SurveySwap.io
 
         Sincerely,
         
@@ -777,7 +776,7 @@ def Negotiation2():
             st.session_state.transformed, "survey_responses2"
         )
         st.success(
-            f"Thank you for your participation! For surveyswap participants the code is 6YWI-MU20-5PKJ"
+            f"Thank you for your participation! For clickworker participants the code is RCf24T14S"
         )
 
 
