@@ -156,7 +156,8 @@ def Home():
 
         This study is conducted by Veronika Tsishetska and Dr. Meltem Aksoy. If you have any questions or need further clarification, feel free to contact us at veronika.tsishetska@tu-dortmund.de and meltem.aksoy@tu-dortmund.de.
 
-        Thank you for your time and valuable contribution.
+        Thank you for your time and valuable contribution. 
+        P.S: This survey contains credits to get free survey responses at SurveySwap.io
 
         Sincerely,
         
