@@ -775,7 +775,9 @@ def Negotiation2():
         file_path = save_data_to_google_sheet(
             st.session_state.transformed, "survey_responses2"
         )
-        st.success(f"Thank you for your participation!")
+        st.success(
+            f"Thank you for your participation! For surveyswap participants the code is 6YWI-MU20-5PKJ"
+        )
 
 
 # if __name__ == "__main__":
