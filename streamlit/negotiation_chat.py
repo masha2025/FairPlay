@@ -770,14 +770,16 @@ def Negotiation2():
         json.dumps(st.session_state.chat_log_2)
     ]
 
-    if st.button("Submit your negotiations", key="submit_neg"):
-        # print("Submitting the following data:", transformed)
-        file_path = save_data_to_google_sheet(
-            st.session_state.transformed, "survey_responses2"
-        )
-        st.success(
-            f"Thank you for your participation! For clickworker participants the code is RCf24T14S"
-        )
+    if interactions >= 14:
+        if st.button("Submit your negotiations", key="submit_neg"):
+            file_path = save_data_to_google_sheet(
+                st.session_state.transformed, "survey_responses2"
+            )
+            st.success(
+                f"Thank you for your participation! For clickworker participants the code is RCf24T14S"
+            )
+    else:
+        st.warning("You must complete 7 rounds of negotiation before submitting.")
 
 
 # if __name__ == "__main__":
